@@ -6,6 +6,29 @@ using UnityEngine;
 
 public class HierarchyObjectSelect : MonoBehaviour
 {
+    [MenuItem("Tools/FBX2Clip")]
+    public static void Fbx2AnimationClip()
+    {
+        var guids = AssetDatabase.FindAssets("t:Model", new string[] { "Assets/UIAnimation/Animator" });
+        foreach(var guid in guids)
+        {
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            Debug.Log(assetPath);
+            var _asset = AssetDatabase.LoadAllAssetRepresentationsAtPath(assetPath);
+            foreach (var assetRepresentation in _asset)
+            {
+                var animationClip = assetRepresentation as AnimationClip;
+
+                if (animationClip != null)
+                {
+                    Debug.Log("Found animation clip");
+                    AssetDatabase.CreateAsset(Object.Instantiate(animationClip), $"Assets/UIAnimation/{animationClip.name}.anim");
+                    AssetDatabase.SaveAssets();
+                }
+            }
+        }
+    }
+
     private static float _lastMenuCallTimestamp;
     [MenuItem("GameObject/Group selected GameObjects", false, 0)]
     public static void GroupSelected(MenuCommand menuCommand)
@@ -45,7 +68,9 @@ public class HierarchyObjectSelect : MonoBehaviour
             PrefabNodeCopy.DeepCopy(gameObject);
         }
 
-        PrefabNodeCopy.SaveData2File(Path.Combine(Application.dataPath, "../DeepCopy/children.json"));
+
+
+        PrefabNodeCopy.SaveData2File(Path.Combine(Application.dataPath, "../DeepCopy/children.xml"));
         Debug.Log("Deep Copy Ok");
     }
 }
